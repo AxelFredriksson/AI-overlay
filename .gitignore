@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+settings.json
+.env
+history/
+run_log.txt

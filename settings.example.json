@@ -1,0 +1,11 @@
+{
+  "model": "gemini-3.6-flash",
+  "hotkey": "ctrl+shift+o",
+  "overlay": {
+    "border_thickness": 8,
+    "corner_size": 16,
+    "default_width": 400,
+    "default_height": 300
+  },
+  "history_dir": "history"
+}

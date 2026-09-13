@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-APP_DIR = Path(__file__).resolve().parent
+# Frozen builds keep their code inside the bundle, so user data goes next to the executable
+# instead — settings, key and history stay with the folder the user unpacked.
+if getattr(sys, "frozen", False):
+    APP_DIR = Path(sys.executable).resolve().parent
+else:
+    APP_DIR = Path(__file__).resolve().parent
 SETTINGS_PATH = APP_DIR / "settings.json"
 ENV_PATH = APP_DIR / ".env"
 

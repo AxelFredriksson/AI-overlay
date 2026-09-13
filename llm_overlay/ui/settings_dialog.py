@@ -6,10 +6,10 @@ from PySide6.QtCore import QObject, QUrl, Signal, Slot
 from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout
 
-from config import Config
-from hotkey import HotkeyParseError, parse_hotkey
-from theme import MODES, ThemeManager, apply_titlebar_theme, css_variables
-from webview import build_web_view
+from llm_overlay.config import Config
+from llm_overlay.hotkey import HotkeyParseError, parse_hotkey
+from llm_overlay.theme import MODES, ThemeManager, apply_titlebar_theme, css_variables
+from llm_overlay.ui.webview import build_web_view
 
 MODEL_CHOICES = [
     "gemini-3.8-flash",

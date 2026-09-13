@@ -8,14 +8,14 @@ from PySide6.QtCore import QObject, QRect, QUrl, Qt, Signal, Slot
 from PySide6.QtGui import QDesktopServices, QGuiApplication, QPixmap
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
-from capture import pixmap_to_png_bytes
-from config import Config
-from history import HistoryStore
-from llm.base import LLMBackend
-from markdown_lite import to_html
-from theme import ThemeManager, css_variables
-from webview import build_web_view
-from worker import AskWorker
+from llm_overlay.capture import pixmap_to_png_bytes
+from llm_overlay.config import Config
+from llm_overlay.history import HistoryStore
+from llm_overlay.llm.base import LLMBackend
+from llm_overlay.markdown_lite import to_html
+from llm_overlay.theme import ThemeManager, css_variables
+from llm_overlay.ui.webview import build_web_view
+from llm_overlay.worker import AskWorker
 
 PANEL_WIDTH = 436
 PANEL_HEIGHT = 620

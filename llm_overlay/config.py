@@ -5,7 +5,8 @@ import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-APP_DIR = Path(__file__).resolve().parent
+# Settings, key and history live in the project root next to run.bat, not inside the package.
+APP_DIR = Path(__file__).resolve().parents[1]
 SETTINGS_PATH = APP_DIR / "settings.json"
 ENV_PATH = APP_DIR / ".env"
 

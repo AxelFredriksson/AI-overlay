@@ -4,7 +4,7 @@ from typing import Callable
 
 from PySide6.QtCore import QThread, Signal
 
-from llm.gemini_client import LLMError
+from llm_overlay.llm.gemini_client import LLMError
 
 
 class AskWorker(QThread):

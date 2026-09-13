@@ -97,15 +97,26 @@ Designens färger definieras en gång i `theme.py` och skickas in i webbsidorna
 som CSS-variabler.
 
 ```
-main.py              programstart och sammankoppling
-overlay_window.py    ramen (flytta, ändra storlek, klickgenomskinlighet)
-overlay_toolbar.py   verktygsfältet ovanför ramen
-panel_window.py      chattpanelen: fönster + brygga mot webbsidan
-settings_dialog.py   inställningsfönstret: dialog + brygga
-webview.py           uppsättning av webbvy och kanal
-theme.py             färgpalett, tema och systemläge
-web/                 panelens och inställningarnas gränssnitt
-llm/                 Gemini-klienten
+main.py                     startar programmet
+llm_overlay/
+    app.py                  kopplar ihop overlay, verktygsfält, panel och systemfält
+    config.py               inställningar och API-nyckel
+    theme.py                färgpalett, tema och systemläge
+    capture.py              skärmdump av ramens område
+    hotkey.py               global hotkey
+    history.py              sparade sessioner
+    markdown_lite.py        markdown till HTML för svaren
+    worker.py               strömmande anrop i bakgrundstråd
+    llm/                    Gemini-klienten bakom ett litet gränssnitt
+    ui/
+        overlay_window.py   ramen (flytta, ändra storlek, klickgenomskinlighet)
+        overlay_toolbar.py  verktygsfältet ovanför ramen
+        panel_window.py     chattpanelen: fönster + brygga mot webbsidan
+        settings_dialog.py  inställningsfönstret: dialog + brygga
+        webview.py          uppsättning av webbvy och kanal
+        web/                panelens och inställningarnas gränssnitt
 ```
+
+`settings.json`, `.env` och `history/` skapas i projektroten, inte i paketet.
 
 Kör direkt från källkoden med `.venv\Scripts\python main.py`.

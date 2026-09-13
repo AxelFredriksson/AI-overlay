@@ -4,7 +4,7 @@ from PySide6.QtCore import QRect, Qt, Signal
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QHBoxLayout, QFrame, QPushButton, QWidget
 
-from theme import Palette, qss
+from llm_overlay.theme import Palette, qss
 
 TOOLBAR_HEIGHT = 44
 TOOLBAR_MARGIN = 10

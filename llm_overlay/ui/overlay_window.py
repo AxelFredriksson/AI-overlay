@@ -7,8 +7,8 @@ from PySide6.QtCore import QPoint, QRect, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
-from config import OverlayConfig
-from theme import DARK, Palette
+from llm_overlay.config import OverlayConfig
+from llm_overlay.theme import DARK, Palette
 
 GWL_EXSTYLE = -20
 WS_EX_LAYERED = 0x00080000

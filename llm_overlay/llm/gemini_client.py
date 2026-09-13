@@ -66,11 +66,16 @@ def _stream_text(stream) -> Iterator[str]:
         raise _classify_error(exc) from exc
 
 
-def _build_config(detail_level: str, thinking_level: str) -> "types.GenerateContentConfig":
+def supports_thinking(model: str) -> bool:
+    """The Gemma models reject thinking_config with 400 Thinking level is not supported."""
+    return not model.lower().startswith("gemma")
+
+
+def _build_config(model: str, detail_level: str, thinking_level: str) -> "types.GenerateContentConfig":
     detail_instruction = DETAIL_INSTRUCTIONS.get(detail_level, DETAIL_INSTRUCTIONS[DEFAULT_DETAIL_LEVEL])
     instruction = f"{FORMATTING_INSTRUCTION}\n\n{detail_instruction}"
     kwargs = {"system_instruction": instruction}
-    if thinking_level in THINKING_LEVELS:
+    if thinking_level in THINKING_LEVELS and supports_thinking(model):
         kwargs["thinking_config"] = types.ThinkingConfig(thinking_level=thinking_level)
     return types.GenerateContentConfig(**kwargs)
 
@@ -104,7 +109,7 @@ class GeminiBackend(LLMBackend):
     ) -> tuple[LLMSession, Iterator[str]]:
         chat = self._client.chats.create(
             model=self._model,
-            config=_build_config(detail_level, thinking_level),
+            config=_build_config(self._model, detail_level, thinking_level),
         )
         part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
         session = GeminiSession(chat)
@@ -122,7 +127,7 @@ class GeminiBackend(LLMBackend):
     ) -> tuple[LLMSession, Iterator[str]]:
         chat = self._client.chats.create(
             model=self._model,
-            config=_build_config(detail_level, thinking_level),
+            config=_build_config(self._model, detail_level, thinking_level),
         )
         session = GeminiSession(chat)
         try:

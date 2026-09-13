@@ -12,6 +12,7 @@ from llm_overlay.capture import pixmap_to_png_bytes
 from llm_overlay.config import Config
 from llm_overlay.history import HistoryStore
 from llm_overlay.llm.base import LLMBackend
+from llm_overlay.llm.gemini_client import supports_thinking
 from llm_overlay.markdown_lite import to_html
 from llm_overlay.theme import ThemeManager, css_variables
 from llm_overlay.ui.webview import build_web_view
@@ -115,8 +116,11 @@ class PanelBridge(QObject):
             "meta": {
                 "model": self._config.model,
                 "detail": SHORT_DETAIL_LABELS.get(self._config.detail_level, self._config.detail_level),
-                "thinking": SHORT_THINKING_LABELS.get(
-                    self._config.thinking_level, self._config.thinking_level
+                # Gemma ignores the thinking level, so don't claim one in the footer.
+                "thinking": (
+                    SHORT_THINKING_LABELS.get(self._config.thinking_level, self._config.thinking_level)
+                    if supports_thinking(self._config.model)
+                    else "–"
                 ),
                 "hotkey": _format_hotkey(self._config.hotkey),
             },

@@ -8,23 +8,6 @@ jobbar i.
 
 ## Kom igång
 
-Det finns två vägar. Vill du bara köra programmet, ta den färdiga versionen —
-den kräver ingenting installerat. Vill du ändra i koden, kör från källkoden.
-
-### Färdig version (kräver inte Python)
-
-1. Hämta `LLM-Overlay-windows.zip` från
-   [Releases](https://github.com/AxelFredriksson/AI-overlay/releases).
-2. Packa upp mappen där du vill ha den — till exempel i Dokument. Undvik
-   `Program Files`, eftersom inställningar och historik sparas i samma mapp.
-3. Starta `LLM Overlay.exe`. Första gången öppnas inställningarna där du
-   klistrar in din API-nyckel (se steg 3 nedan).
-
-Windows kan varna för att programmet är okänt eftersom det saknar
-kodsignering — välj *Mer information → Kör ändå*.
-
-### Från källkoden
-
 1. **Ladda ner projektet**
 
    ```powershell
@@ -126,14 +109,3 @@ llm/                 Gemini-klienten
 ```
 
 Kör direkt från källkoden med `.venv\Scripts\python main.py`.
-
-### Bygga en ny release
-
-`build_exe.bat` paketerar allt med PyInstaller enligt `LLMOverlay.spec` och
-lägger resultatet i `dist\` — både som mapp och som `LLM-Overlay-windows.zip`
-(cirka 220 MB, mest QtWebEngine). Skriptet skriver ut kommandot för att ladda
-upp zippen till GitHub Releases när det är klart.
-
-I den byggda versionen ligger `settings.json`, `.env` och `history/` bredvid
-`LLM Overlay.exe` i stället för i projektmappen, så hela mappen kan flyttas
-mellan datorer med inställningarna kvar.

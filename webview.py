@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 from PySide6.QtCore import QFile, QIODevice, QObject, QUrl, Qt
@@ -10,8 +9,7 @@ from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtWebEngineCore import QWebEngineScript
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
-# PyInstaller unpacks bundled data to _MEIPASS; from source it sits next to this module.
-WEB_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "web"
+WEB_DIR = Path(__file__).resolve().parent / "web"
 
 
 def _qwebchannel_source() -> str:

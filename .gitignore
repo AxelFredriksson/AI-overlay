@@ -5,5 +5,3 @@ settings.json
 .env
 history/
 run_log.txt
-build/
-dist/

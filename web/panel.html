@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>LLM Overlay</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="panel">
+  <header class="panel-head">
+    <button class="session-chip" id="session-btn">
+      <svg class="ic sm"><use href="#i-history"></use></svg>
+      <span id="session-title">Ny session</span>
+      <svg class="ic sm" id="session-chevron"><use href="#i-chevron"></use></svg>
+    </button>
+    <span class="grow"></span>
+    <button class="icon-btn" id="new-btn" title="Ny session"><svg class="ic"><use href="#i-plus"></use></svg></button>
+    <button class="icon-btn" id="theme-btn" title="Tema"><svg class="ic"><use href="#i-contrast" id="theme-icon"></use></svg></button>
+    <button class="icon-btn" id="close-btn" title="Dölj panelen"><svg class="ic"><use href="#i-close"></use></svg></button>
+  </header>
+
+  <div class="image-row hidden" id="image-row">
+    <img class="image-thumb" id="image-thumb" alt="">
+    <div class="image-text">
+      <div class="image-title">Skärmdump bifogad</div>
+      <div class="image-meta mono" id="image-meta"></div>
+    </div>
+    <button class="icon-btn sm" id="remove-image" title="Ta bort skärmdumpen"><svg class="ic sm"><use href="#i-close"></use></svg></button>
+  </div>
+
+  <main class="body">
+    <section class="transcript" id="transcript"></section>
+
+    <section class="history hidden" id="history">
+      <div class="search">
+        <svg class="ic sm"><use href="#i-search"></use></svg>
+        <input id="search" placeholder="Sök i historiken…" autocomplete="off">
+      </div>
+      <div class="history-list" id="history-list"></div>
+      <div class="history-foot mono">
+        <span id="history-count"></span>
+        <a href="#" id="open-folder">Öppna mappen</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="error-card hidden" id="error-card">
+    <svg class="ic error-icon"><use href="#i-error"></use></svg>
+    <div>
+      <div class="error-title">Ingen API-nyckel konfigurerad</div>
+      <div class="error-body">Lägg in din Gemini-nyckel under Inställningar → Modell &amp; nyckel för att kunna ställa frågor.</div>
+      <button class="btn-accent" id="open-settings">Öppna inställningar</button>
+    </div>
+  </div>
+
+  <footer class="composer" id="composer">
+    <div class="pill" id="pill">
+      <input id="input" placeholder="Skriv en fråga…" autocomplete="off">
+      <button class="send" id="send" title="Skicka"><svg class="ic"><use href="#i-arrow-up"></use></svg></button>
+    </div>
+    <div class="composer-meta mono">
+      <span id="meta-left"></span>
+      <span class="grow"></span>
+      <span id="meta-right"></span>
+    </div>
+  </footer>
+</div>
+<script src="panel.js"></script>
+</body>
+</html>

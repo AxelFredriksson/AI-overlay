@@ -12,10 +12,12 @@ ENV_PATH = APP_DIR / ".env"
 
 @dataclass
 class OverlayConfig:
-    border_thickness: int = 8
+    border_thickness: int = 8  # grab margin for moving the frame, not the drawn line
+    line_width: int = 2
     corner_size: int = 16
     default_width: int = 400
     default_height: int = 300
+    color: str = ""  # empty follows the theme's ink colour
 
 
 @dataclass
@@ -25,6 +27,12 @@ class Config:
     hotkey: str = "ctrl+shift+o"
     overlay: OverlayConfig = field(default_factory=OverlayConfig)
     history_dir: str = "history"
+    auto_send: bool = False
+    auto_send_question: str = "Beskriv vad som visas i den här skärmdumpen."
+    detail_level: str = "medel"
+    thinking_level: str = "dynamic"
+    save_history: bool = True
+    theme: str = "system"
 
     @property
     def history_path(self) -> Path:
@@ -79,12 +87,19 @@ def load_config(path: Path = SETTINGS_PATH) -> Config:
         save_api_key(legacy_key)
         api_key = legacy_key
 
+    defaults = Config()
     return Config(
         gemini_api_key=api_key,
-        model=data.get("model", "gemini-3.6-flash"),
-        hotkey=data.get("hotkey", "ctrl+shift+o"),
+        model=data.get("model", defaults.model),
+        hotkey=data.get("hotkey", defaults.hotkey),
         overlay=OverlayConfig(**overlay_data) if overlay_data else OverlayConfig(),
-        history_dir=data.get("history_dir", "history"),
+        history_dir=data.get("history_dir", defaults.history_dir),
+        auto_send=data.get("auto_send", defaults.auto_send),
+        auto_send_question=data.get("auto_send_question", defaults.auto_send_question),
+        detail_level=data.get("detail_level", defaults.detail_level),
+        thinking_level=data.get("thinking_level", defaults.thinking_level),
+        save_history=data.get("save_history", defaults.save_history),
+        theme=data.get("theme", defaults.theme),
     )
 
 
@@ -94,6 +109,12 @@ def save_config(config: Config, path: Path = SETTINGS_PATH) -> None:
         "hotkey": config.hotkey,
         "overlay": asdict(config.overlay),
         "history_dir": config.history_dir,
+        "auto_send": config.auto_send,
+        "auto_send_question": config.auto_send_question,
+        "detail_level": config.detail_level,
+        "thinking_level": config.thinking_level,
+        "save_history": config.save_history,
+        "theme": config.theme,
     }
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     save_api_key(config.gemini_api_key)

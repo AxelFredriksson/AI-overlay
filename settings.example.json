@@ -3,9 +3,17 @@
   "hotkey": "ctrl+shift+o",
   "overlay": {
     "border_thickness": 8,
+    "line_width": 2,
+    "color": "",
     "corner_size": 16,
     "default_width": 400,
     "default_height": 300
   },
-  "history_dir": "history"
+  "history_dir": "history",
+  "auto_send": false,
+  "auto_send_question": "Beskriv vad som visas i den här skärmdumpen.",
+  "detail_level": "medel",
+  "thinking_level": "dynamic",
+  "save_history": true,
+  "theme": "system"
 }

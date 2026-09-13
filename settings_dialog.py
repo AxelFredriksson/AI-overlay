@@ -1,84 +1,208 @@
 from __future__ import annotations
 
-from PySide6.QtWidgets import (
-    QComboBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLineEdit,
-    QVBoxLayout,
-)
+import json
+
+from PySide6.QtCore import QObject, QUrl, Signal, Slot
+from PySide6.QtGui import QColor, QDesktopServices
+from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout
 
 from config import Config
 from hotkey import HotkeyParseError, parse_hotkey
+from theme import MODES, ThemeManager, apply_titlebar_theme, css_variables
+from webview import build_web_view
 
 MODEL_CHOICES = [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-3.5-flash-lite",
-    "gemini-2.5-flash",
+    "gemini-3.1-pro",
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash",
+]
+
+DETAIL_LEVEL_LABELS = {
+    "kort": "Kort",
+    "medel": "Medel",
+    "detaljerad": "Detaljerad",
+}
+
+THINKING_LEVEL_LABELS = {
+    "dynamic": "Standard (dynamisk)",
+    "low": "Låg",
+    "medium": "Medel",
+    "high": "Hög",
+}
+
+THEME_MODE_LABELS = {"system": "System", "light": "Ljust", "dark": "Mörkt"}
+
+COLOR_PRESETS = [
+    {"value": "", "label": "Följ tema"},
+    {"value": "#4C6B5A", "label": "Salvia"},
+    {"value": "#2C2823", "label": "Bläck"},
+    {"value": "#F4F1EA", "label": "Papper"},
+    {"value": "#C0392B", "label": "Röd"},
+    {"value": "#D97706", "label": "Orange"},
+    {"value": "#2563EB", "label": "Blå"},
+    {"value": "#DB2777", "label": "Magenta"},
 ]
 
 
-class SettingsDialog(QDialog):
-    def __init__(self, config: Config, parent=None):
+class SettingsBridge(QObject):
+    stateChanged = Signal(str)
+    themeChanged = Signal(str)
+    saveFailed = Signal(str)
+    saved = Signal()
+    cancelled = Signal()
+    quitRequested = Signal()
+
+    def __init__(self, config: Config, theme_manager: ThemeManager | None, parent: QObject | None = None):
         super().__init__(parent)
-        self.setWindowTitle("LLM Overlay - Inställningar")
-        self.setModal(True)
         self._config = config
+        self._theme = theme_manager
+        # Theme changes are previewed live; the original is restored unless the user saves.
+        self._original_theme_mode = theme_manager.mode if theme_manager else config.theme
 
-        self.api_key_input = QLineEdit(config.gemini_api_key)
-        self.api_key_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.api_key_input.setPlaceholderText("Din Gemini API-nyckel")
+    def _state(self) -> dict:
+        config = self._config
+        palette_vars = css_variables(self._theme.palette) if self._theme else ""
+        return {
+            "theme": {"vars": palette_vars},
+            "config": {
+                "apiKey": config.gemini_api_key,
+                "hasKey": bool(config.gemini_api_key.strip()),
+                "model": config.model,
+                "models": MODEL_CHOICES,
+                "hotkey": config.hotkey,
+                "autoSend": config.auto_send,
+                "autoSendQuestion": config.auto_send_question,
+                "detailLevel": config.detail_level,
+                "detailLevels": list(DETAIL_LEVEL_LABELS.items()),
+                "thinkingLevel": config.thinking_level,
+                "thinkingLevels": list(THINKING_LEVEL_LABELS.items()),
+                "saveHistory": config.save_history,
+                # The live manager, not the config: a previewed theme must stay selected, otherwise
+                # the page snaps the choice back and saves the old one.
+                "themeMode": self._theme.mode if self._theme else config.theme,
+                "themeModes": list(THEME_MODE_LABELS.items()),
+                "historyPath": str(config.history_path),
+                "overlay": {
+                    "width": config.overlay.default_width,
+                    "height": config.overlay.default_height,
+                    "lineWidth": config.overlay.line_width,
+                    "grab": config.overlay.border_thickness,
+                    "corner": config.overlay.corner_size,
+                    "color": config.overlay.color,
+                    "colorPresets": COLOR_PRESETS,
+                },
+            },
+        }
 
-        self.model_input = QComboBox()
-        self.model_input.setEditable(True)
-        self.model_input.addItems(MODEL_CHOICES)
-        self.model_input.setCurrentText(config.model)
+    @Slot()
+    def ready(self) -> None:
+        self.stateChanged.emit(json.dumps(self._state()))
 
-        self.hotkey_input = QLineEdit(config.hotkey)
-        self.hotkey_input.setPlaceholderText("t.ex. ctrl+shift+o")
+    @Slot(str)
+    def previewTheme(self, mode: str) -> None:  # noqa: N802 - JS-facing name
+        # Only the palette goes back to the page: a full state push would re-render the form and
+        # discard whatever the user has typed but not saved yet.
+        if self._theme is not None:
+            self._theme.set_mode(mode)
+            self.themeChanged.emit(css_variables(self._theme.palette))
 
-        form = QFormLayout()
-        form.addRow("Gemini API-nyckel:", self.api_key_input)
-        form.addRow("Modell:", self.model_input)
-        form.addRow("Global hotkey:", self.hotkey_input)
+    @Slot()
+    def openHistoryFolder(self) -> None:  # noqa: N802 - JS-facing name
+        self._config.history_path.mkdir(parents=True, exist_ok=True)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self._config.history_path)))
 
-        self.error_label = QLineEdit()
-        self.error_label.setReadOnly(True)
-        self.error_label.setStyleSheet("color: red; border: none; background: transparent;")
-        self.error_label.hide()
+    @Slot()
+    def cancel(self) -> None:
+        self.cancelled.emit()
 
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        )
-        buttons.accepted.connect(self._on_accept)
-        buttons.rejected.connect(self.reject)
+    @Slot()
+    def quitApp(self) -> None:  # noqa: N802 - JS-facing name
+        self.quitRequested.emit()
 
-        layout = QVBoxLayout(self)
-        layout.addLayout(form)
-        layout.addWidget(self.error_label)
-        layout.addWidget(buttons)
-
-    def _on_accept(self) -> None:
-        api_key = self.api_key_input.text().strip()
-        hotkey = self.hotkey_input.text().strip().lower()
+    @Slot(str)
+    def save(self, payload: str) -> None:
+        data = json.loads(payload)
+        api_key = data["apiKey"].strip()
+        hotkey = data["hotkey"].strip().lower()
         if not api_key:
-            self._show_error("API-nyckel krävs.")
+            self.saveFailed.emit("API-nyckel krävs.")
             return
         try:
             parse_hotkey(hotkey)
         except HotkeyParseError as exc:
-            self._show_error(str(exc))
+            self.saveFailed.emit(str(exc))
             return
-        self._config.gemini_api_key = api_key
-        self._config.model = self.model_input.currentText().strip() or "gemini-2.5-flash"
-        self._config.hotkey = hotkey
-        self.accept()
 
-    def _show_error(self, message: str) -> None:
-        self.error_label.setText(message)
-        self.error_label.show()
+        config = self._config
+        config.gemini_api_key = api_key
+        config.model = data["model"].strip() or "gemini-3.6-flash"
+        config.hotkey = hotkey
+        config.auto_send = bool(data["autoSend"])
+        config.auto_send_question = data["autoSendQuestion"].strip() or config.auto_send_question
+        config.detail_level = data["detailLevel"]
+        config.thinking_level = data["thinkingLevel"]
+        config.save_history = bool(data["saveHistory"])
+        config.theme = data["themeMode"]
+        overlay = data["overlay"]
+        frame_color = overlay["color"].strip()
+        if frame_color and not QColor(frame_color).isValid():
+            self.saveFailed.emit(f"Ogiltig ramfärg: {frame_color}")
+            return
+        config.overlay.color = frame_color
+        config.overlay.default_width = int(overlay["width"])
+        config.overlay.default_height = int(overlay["height"])
+        config.overlay.line_width = int(overlay["lineWidth"])
+        config.overlay.border_thickness = int(overlay["grab"])
+        config.overlay.corner_size = int(overlay["corner"])
+
+        if self._theme is not None:
+            self._theme.set_mode(config.theme)
+        self.saved.emit()
+
+    def restore_theme(self) -> None:
+        """Undoes the live preview when the dialog closes without saving."""
+        if self._theme is not None:
+            self._theme.set_mode(self._original_theme_mode)
+
+
+class SettingsDialog(QDialog):
+    def __init__(self, config: Config, theme_manager: ThemeManager | None = None, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("LLM Overlay – Inställningar")
+        self.setModal(True)
+        self.resize(780, 520)
+        self._config = config
+        self._theme = theme_manager
+
+        self.bridge = SettingsBridge(config, theme_manager, self)
+        self.bridge.saved.connect(self.accept)
+        self.bridge.cancelled.connect(self.reject)
+        self.bridge.quitRequested.connect(self._on_quit)
+
+        self.view = build_web_view("settings.html", self.bridge, transparent=False)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.view)
+
+    def showEvent(self, event) -> None:  # noqa: N802 - Qt override
+        super().showEvent(event)
+        if self._theme is not None:
+            apply_titlebar_theme(self, self._theme.resolved_mode() == "dark")
+
+    def reject(self) -> None:  # noqa: N802 - Qt override
+        self.bridge.restore_theme()
+        super().reject()
+
+    def _on_quit(self) -> None:
+        self.reject()
+        app = QApplication.instance()
+        if app is not None:
+            app.quit()
 
     def result_config(self) -> Config:
         return self._config

@@ -4,10 +4,11 @@ import ctypes
 from ctypes import wintypes
 
 from PySide6.QtCore import QPoint, QRect, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QCursor, QPainter, QPen
+from PySide6.QtGui import QColor, QCursor, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
 from config import OverlayConfig
+from theme import DARK, Palette
 
 GWL_EXSTYLE = -20
 WS_EX_LAYERED = 0x00080000
@@ -50,6 +51,8 @@ class OverlayWindow(QWidget):
         self._drag_mode: str | None = None
         self._drag_start_global = QPoint()
         self._drag_start_geom = QRect()
+        self._hover_zone = "outside"
+        self._palette: Palette = DARK
 
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint
@@ -79,16 +82,60 @@ class OverlayWindow(QWidget):
         super().hideEvent(event)
         self._poll_timer.stop()
 
+    # -- theming -----------------------------------------------------------
+
+    def apply_theme(self, palette: Palette) -> None:
+        self._palette = palette
+        self.update()
+
     # -- painting --------------------------------------------------------
+
+    def _line_color(self) -> QColor:
+        active = self._hover_zone not in ("interior", "outside") or self._drag_mode is not None
+        if self._cfg.color:
+            custom = QColor(self._cfg.color)
+            return custom.lighter(135) if active else custom
+        return QColor(self._palette.accent if active else self._palette.ink)
 
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)
-        thickness = self._cfg.border_thickness
-        pen = QPen(QColor(255, 60, 60), thickness)
-        painter.setPen(pen)
-        half = thickness // 2
-        painter.drawRect(self.rect().adjusted(half, half, -half - 1, -half - 1))
+        color = self._line_color()
+        width, height = self.width(), self.height()
+        line = max(1, min(self._cfg.line_width, min(width, height) // 2))
+
+        # Filled edges rather than drawRect: a pen is centred on its path, which clipped the
+        # right/bottom lines and pushed the corner marks half outside the window.
+        painter.fillRect(0, 0, width, line, color)
+        painter.fillRect(0, height - line, width, line, color)
+        painter.fillRect(0, 0, line, height, color)
+        painter.fillRect(width - line, 0, line, height, color)
+
+        corner = max(9, line * 3)
+        if corner * 2 < min(width, height):
+            for x in (0, width - corner):
+                for y in (0, height - corner):
+                    painter.fillRect(x, y, corner, corner, color)
+
+        if self._drag_mode is not None:
+            self._draw_size_badge(painter, self.rect())
+
+    def _draw_size_badge(self, painter: QPainter, rect: QRect) -> None:
+        text = f"{self.width()} × {self.height()}"
+        font = QFont("Consolas", 8)
+        painter.setFont(font)
+        metrics = QFontMetrics(font)
+        pad_x, pad_y = 8, 4
+        text_w = metrics.horizontalAdvance(text)
+        text_h = metrics.height()
+        badge_w = text_w + pad_x * 2
+        badge_h = text_h + pad_y * 2
+        badge_rect = QRect(rect.right() - badge_w - 10, rect.bottom() - badge_h - 10, badge_w, badge_h)
+        painter.setBrush(QColor(self._palette.surface))
+        painter.setPen(QPen(QColor(self._palette.border), 1))
+        painter.drawRoundedRect(badge_rect, 6, 6)
+        painter.setPen(QColor(self._palette.ink_soft))
+        painter.drawText(badge_rect, Qt.AlignmentFlag.AlignCenter, text)
 
     # -- hit testing -------------------------------------------------------
 
@@ -126,6 +173,9 @@ class OverlayWindow(QWidget):
         if want_click_through != self._click_through_active:
             set_click_through(self._hwnd, want_click_through)
             self._click_through_active = want_click_through
+        if zone != self._hover_zone:
+            self._hover_zone = zone
+            self.update()
         self._update_cursor(zone)
 
     def _update_cursor(self, zone: str):
@@ -173,6 +223,7 @@ class OverlayWindow(QWidget):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_mode = None
+            self.update()
 
     def moveEvent(self, event):
         super().moveEvent(event)

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>Inställningar</title>
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="settings.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="sidebar">
+    <button class="nav-item active" data-page="behaviour"><svg class="ic"><use href="#i-bolt"></use></svg>Beteende</button>
+    <button class="nav-item" data-page="model"><svg class="ic"><use href="#i-key"></use></svg>Modell &amp; nyckel</button>
+    <button class="nav-item" data-page="shortcuts"><svg class="ic"><use href="#i-keyboard"></use></svg>Genvägar</button>
+    <button class="nav-item" data-page="overlay"><svg class="ic"><use href="#i-frame"></use></svg>Overlay</button>
+    <button class="nav-item" data-page="history"><svg class="ic"><use href="#i-history"></use></svg>Historik</button>
+    <span class="grow"></span>
+    <button class="nav-item danger" id="quit"><svg class="ic"><use href="#i-power"></use></svg>Avsluta programmet</button>
+  </nav>
+
+  <main class="content">
+    <div class="pages">
+      <section class="page active" id="page-behaviour">
+        <div class="section-label">När du trycker Fråga</div>
+        <div class="toggle-row">
+          <button class="switch" id="auto-send" role="switch"><span class="knob"></span></button>
+          <div>
+            <div class="row-title">Skicka direkt utan att skriva</div>
+            <div class="row-hint">Skärmdumpen skickas med standardfrågan nedan så fort ramen fångas.</div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="row-hint" for="auto-question">Standardfråga</label>
+          <input id="auto-question" class="control" type="text">
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">Svar</div>
+
+        <div class="row">
+          <div class="row-label"><div class="row-title">Detaljnivå</div></div>
+          <div class="segmented" id="detail"></div>
+        </div>
+
+        <div class="row">
+          <div class="row-label">
+            <div class="row-title">Resoneringsnivå</div>
+            <div class="row-hint">Högre = bättre på svåra frågor, men långsammare.</div>
+          </div>
+          <div class="dropdown grow-control" id="thinking"></div>
+        </div>
+
+        <div class="row">
+          <div class="row-label">
+            <div class="row-title">Tema</div>
+            <div class="row-hint">Gäller panel, verktygsfält och inställningar.</div>
+          </div>
+          <div class="segmented" id="theme"></div>
+        </div>
+
+        <div class="toggle-row">
+          <button class="switch" id="save-history" role="switch"><span class="knob"></span></button>
+          <div>
+            <div class="row-title">Spara historik lokalt</div>
+            <div class="row-hint">Skärmdumpar och svar sparas i <span class="mono">history/</span> på den här datorn.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-model">
+        <div class="section-label">Gemini API-nyckel</div>
+        <div class="key-row">
+          <input id="api-key" type="password" class="control" placeholder="Din Gemini API-nyckel">
+          <button class="btn-outline" id="toggle-key">Visa</button>
+        </div>
+        <div class="status" id="key-status"></div>
+
+        <div class="section-label spaced">Modell</div>
+        <div class="dropdown" id="model"></div>
+        <div class="row-hint">Flash-modellerna är snabbast och räcker för skärmfrågor. Pro ger bättre svar på svåra bilder. Du kan även skriva in ett eget modellnamn.</div>
+      </section>
+
+      <section class="page" id="page-shortcuts">
+        <div class="section-label">Global genväg</div>
+        <div class="keycaps" id="keycaps"></div>
+        <div class="row-hint">Visar / döljer overlayn, var som helst i systemet.</div>
+        <input id="hotkey" class="control spaced" placeholder="t.ex. ctrl+shift+o">
+      </section>
+
+      <section class="page" id="page-overlay">
+        <div class="section-label">Ramens storlek</div>
+        <div class="row">
+          <div class="row-label"><div class="row-title">Standardbredd</div></div>
+          <input id="overlay-width" class="control narrow" type="number" min="100" max="4000">
+        </div>
+        <div class="row">
+          <div class="row-label"><div class="row-title">Standardhöjd</div></div>
+          <input id="overlay-height" class="control narrow" type="number" min="80" max="4000">
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">Ramens utseende</div>
+        <div class="row">
+          <div class="row-label">
+            <div class="row-title">Linjetjocklek</div>
+            <div class="row-hint">Tjockleken på ramens streck.</div>
+          </div>
+          <input id="overlay-line" class="control narrow" type="number" min="1" max="10">
+        </div>
+        <div class="row">
+          <div class="row-label">
+            <div class="row-title">Gripzon</div>
+            <div class="row-hint">Hur brett fältet vid kanten är när du drar ramen.</div>
+          </div>
+          <input id="overlay-grab" class="control narrow" type="number" min="2" max="40">
+        </div>
+        <div class="row">
+          <div class="row-label">
+            <div class="row-title">Hörnzon</div>
+            <div class="row-hint">Storleken på hörnen du ändrar storlek med.</div>
+          </div>
+          <input id="overlay-corner" class="control narrow" type="number" min="4" max="80">
+        </div>
+        <div class="row">
+          <div class="row-label">
+            <div class="row-title">Ramens färg</div>
+            <div class="row-hint">"Följ tema" använder bläck i ljust läge och papper i mörkt.</div>
+          </div>
+          <div class="color-field">
+            <div class="swatches" id="color-swatches"></div>
+            <input id="overlay-color" class="control hex" placeholder="#RRGGBB" spellcheck="false">
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="section-label">Historik</div>
+        <div class="toggle-row">
+          <button class="switch" id="save-history-2" role="switch"><span class="knob"></span></button>
+          <div>
+            <div class="row-title">Spara historik lokalt</div>
+            <div class="row-hint" id="history-path"></div>
+          </div>
+        </div>
+        <button class="btn-outline" id="open-folder">Öppna mappen</button>
+      </section>
+    </div>
+
+    <div class="error hidden" id="error"></div>
+
+    <footer class="actions">
+      <button class="btn-outline" id="cancel">Avbryt</button>
+      <button class="btn-accent big" id="save">Spara</button>
+    </footer>
+  </main>
+</div>
+<script src="settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+/* Design tokens arrive from Python as inline custom properties on :root (theme.css_variables). */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 13.5px;
+  color: var(--ink);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mono {
+  font-family: Consolas, "Cascadia Mono", monospace;
+}
+
+.grow {
+  flex: 1;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sprite {
+  display: none;
+}
+
+.ic {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ic.sm {
+  width: 15px;
+  height: 15px;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+  color: inherit;
+}
+
+input:focus {
+  outline: none;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--ink-soft);
+}
+
+.icon-btn:hover {
+  background: var(--bubble);
+  color: var(--ink);
+}
+
+.icon-btn.sm {
+  width: 24px;
+  height: 24px;
+  color: var(--ink-faint);
+}
+
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.btn-accent:hover {
+  background: var(--accent-hover);
+}
+
+.btn-outline {
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.btn-outline:hover {
+  background: var(--bubble);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  color: var(--ink-soft);
+  font-size: 11.5px;
+}
+
+.chip:hover {
+  background: var(--bubble);
+  color: var(--ink);
+}
+
+.section-label {
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-on);
+}

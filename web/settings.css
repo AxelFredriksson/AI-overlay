@@ -1,0 +1,381 @@
+body {
+  background: var(--surface);
+}
+
+.shell {
+  display: flex;
+  height: 100%;
+}
+
+/* -- sidebar -------------------------------------------------------------- */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 202px;
+  flex: none;
+  padding: 12px 10px;
+  background: var(--surface-alt);
+  border-right: 1px solid var(--border-soft);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-align: left;
+}
+
+.nav-item .ic {
+  color: var(--ink-faint);
+}
+
+.nav-item:hover {
+  background: var(--bubble);
+}
+
+.nav-item.active {
+  background: var(--bubble);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.nav-item.active .ic {
+  color: var(--ink);
+}
+
+.nav-item.danger {
+  color: var(--danger-icon);
+}
+
+.nav-item.danger .ic {
+  color: var(--danger-icon);
+}
+
+.nav-item.danger:hover {
+  background: var(--danger-bg);
+}
+
+/* -- content -------------------------------------------------------------- */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 20px 22px 16px;
+}
+
+.pages {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.page {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.page.active {
+  display: flex;
+}
+
+.section-label.spaced,
+.control.spaced {
+  margin-top: 8px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-soft);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.row-label {
+  width: 150px;
+  flex: none;
+}
+
+.row-title {
+  font-size: 13.5px;
+}
+
+.row-hint {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-soft);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control {
+  padding: 9px 11px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 9px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.control.narrow {
+  width: 110px;
+}
+
+.grow-control {
+  flex: 1;
+}
+
+/* -- dropdown -------------------------------------------------------------- */
+
+.dropdown {
+  position: relative;
+  display: flex;
+  min-width: 220px;
+}
+
+.dd-field {
+  flex: 1;
+  min-width: 0;
+  padding-right: 34px;
+  text-align: left;
+  cursor: pointer;
+}
+
+input.dd-field {
+  cursor: text;
+}
+
+.dd-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 100%;
+  color: var(--ink-faint);
+}
+
+.dd-toggle:hover {
+  color: var(--ink);
+}
+
+.dd-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.dd-item {
+  display: block;
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 7px;
+  color: var(--ink);
+  font-size: 12.5px;
+  text-align: left;
+}
+
+.dd-item:hover {
+  background: var(--bubble);
+}
+
+.dd-item.active {
+  background: var(--bubble);
+  font-weight: 600;
+}
+
+/* -- colour picker --------------------------------------------------------- */
+
+.color-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.swatches {
+  display: flex;
+  gap: 6px;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.swatch.auto {
+  background: linear-gradient(135deg, var(--ink) 50%, var(--surface-alt) 50%);
+}
+
+.swatch.active {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.control.hex {
+  width: 110px;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  text-transform: uppercase;
+}
+
+/* The native spin buttons are drawn by the platform and ignore the palette. */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* -- toggles & segments ---------------------------------------------------- */
+
+.toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.switch {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 10px;
+  background: var(--border);
+  transition: background 0.15s ease;
+}
+
+.switch.on {
+  background: var(--accent);
+}
+
+.switch .knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--knob);
+  transition: left 0.15s ease;
+}
+
+.switch.on .knob {
+  left: 16px;
+}
+
+.segmented {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--bubble);
+}
+
+.segmented button {
+  padding: 5px 12px;
+  border-radius: 7px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+.segmented button.active {
+  background: var(--elevated);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* -- model & shortcut pages ------------------------------------------------- */
+
+.key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.key-row .control {
+  flex: 1;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  letter-spacing: 0.08em;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.status.connected {
+  color: var(--accent);
+}
+
+.keycaps {
+  display: flex;
+  gap: 5px;
+}
+
+.keycap {
+  padding: 5px 10px;
+  background: var(--bubble);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 12px;
+}
+
+/* -- footer ---------------------------------------------------------------- */
+
+.error {
+  padding-top: 10px;
+  color: var(--danger-icon);
+  font-size: 12.5px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 14px;
+}
+
+.btn-accent.big {
+  padding: 8px 18px;
+  font-size: 13px;
+}
